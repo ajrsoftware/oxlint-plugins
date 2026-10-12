@@ -3,8 +3,8 @@ name: Release
 # On every push to main, changesets/action does one of two things:
 #   - pending changesets → opens (or updates) a "chore: release" PR that bumps
 #     versions and writes CHANGELOGs, and turns on auto-merge for it
-#   - no pending changesets → publishes any plugin whose version isn't on the
-#     registry yet, then tags it and creates a GitHub release
+#   - no pending changesets → publishes any plugin whose version isn't on
+#     npm yet, then tags it and creates a GitHub release
 on:
     push:
         branches: [main]
@@ -23,7 +23,9 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
-            packages: write
+            # npm trusted publishing: npm accepts this workflow's OIDC identity
+            # in place of a token, and attaches provenance to each release.
+            id-token: write
         steps:
             # Pushes, PRs and merges made with the default GITHUB_TOKEN don't
             # trigger other workflows, so the release PR would never get CI
@@ -42,8 +44,7 @@ jobs:
               with:
                   node-version-file: .nvmrc
                   cache: pnpm
-                  registry-url: https://npm.pkg.github.com
-                  scope: '@ajrsoftware'
+                  registry-url: https://registry.npmjs.org
 
             - run: pnpm install --frozen-lockfile
 
@@ -54,9 +55,6 @@ jobs:
                   publish-script: pnpm release
                   commit-message: 'chore: release'
                   pr-title: 'chore: release'
-              env:
-                  # GitHub Packages accepts the workflow's own token for publishing.
-                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             # Merges once CI passes on the release PR, which publishes on the
             # next run of this workflow. Remove this step to review releases by hand.

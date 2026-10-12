@@ -11,15 +11,6 @@ Loading the plugin enables nothing on its own. Turn on the rules you want, so a 
 
 ## Install
 
-The package is published to GitHub Packages. Point the `@ajrsoftware` scope there in your project's `.npmrc`; every other package still installs from npmjs.com.
-
-```ini
-@ajrsoftware:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
-
-`GITHUB_TOKEN` needs the `read:packages` scope, including in CI and deploy builds.
-
 ```sh
 pnpm add -D @ajrsoftware/oxlint-plugin-purist
 ```

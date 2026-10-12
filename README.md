@@ -1,6 +1,6 @@
 # oxlint-plugins
 
-A collection of [oxlint](https://oxc.rs/docs/guide/usage/linter) JS plugins from AJR Software. Each plugin is published on its own to GitHub Packages, so a project installs only the rules it wants.
+A collection of [oxlint](https://oxc.rs/docs/guide/usage/linter) JS plugins from AJR Software. Each plugin is published on its own to npm, so a project installs only the rules it wants.
 
 | Plugin                                                            | What it offers                                                                       |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -64,11 +64,11 @@ Releases are automatic and follow semver as ESLint plugins do:
 
 1. A PR with a changeset merges to `main`.
 2. The release workflow opens a `chore: release` PR that bumps versions and writes each plugin's `CHANGELOG.md`, and turns on auto-merge.
-3. Once CI passes it merges, and the next run publishes to GitHub Packages, tags `@ajrsoftware/oxlint-plugin-<name>@<version>`, and creates a GitHub release.
+3. Once CI passes it merges, and the next run publishes to npm with provenance, tags `@ajrsoftware/oxlint-plugin-<name>@<version>`, and creates a GitHub release.
 
 Dependabot's minor and patch PRs auto-merge once CI passes, so every week the plugins are tested against the newest oxlint. They release nothing, because they don't change what is published. Majors wait for review.
 
-Setup this relies on: a GitHub App installed on the repo (contents and pull requests: read and write) whose client ID and private key are stored as `RELEASE_APP_CLIENT_ID` and `RELEASE_APP_PRIVATE_KEY` in both the Actions and the Dependabot secrets; auto-merge allowed in the repo settings; and a ruleset on `main` requiring the `Check, test and build` check.
+Setup this relies on: a GitHub App installed on the repo (contents and pull requests: read and write) whose client ID and private key are stored as `RELEASE_APP_CLIENT_ID` and `RELEASE_APP_PRIVATE_KEY` in both the Actions and the Dependabot secrets; each plugin on npm linked to `release.yml` as a trusted publisher; auto-merge allowed in the repo settings; and a ruleset on `main` requiring the `Check, test and build` check.
 
 ### Adding a plugin
 

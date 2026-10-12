@@ -21,7 +21,7 @@
     "type": "module",
     "exports": "./dist/index.mjs",
     "publishConfig": {
-        "registry": "https://npm.pkg.github.com"
+        "access": "public"
     },
     "scripts": {
         "build": "tsdown",
