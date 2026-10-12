@@ -68,7 +68,7 @@ Releases are automatic and follow semver as ESLint plugins do:
 
 Dependabot's minor and patch PRs auto-merge once CI passes, so every week the plugins are tested against the newest oxlint. They release nothing, because they don't change what is published. Majors wait for review.
 
-Setup this relies on: a GitHub App installed on the repo (contents and pull requests: read and write) whose ID and private key are stored as `RELEASE_APP_ID` and `RELEASE_APP_PRIVATE_KEY` in both the Actions and the Dependabot secrets; auto-merge allowed in the repo settings; and a ruleset on `main` requiring the `Check, test and build` check.
+Setup this relies on: a GitHub App installed on the repo (contents and pull requests: read and write) whose client ID and private key are stored as `RELEASE_APP_CLIENT_ID` and `RELEASE_APP_PRIVATE_KEY` in both the Actions and the Dependabot secrets; auto-merge allowed in the repo settings; and a ruleset on `main` requiring the `Check, test and build` check.
 
 ### Adding a plugin
 
