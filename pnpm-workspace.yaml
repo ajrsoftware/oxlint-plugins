@@ -1,0 +1,20 @@
+minimumReleaseAge: 1440
+
+# Every shared dependency is pinned here once and referenced as `catalog:`,
+# so all packages resolve the same version. Strict mode makes `pnpm add`
+# refuse versions that aren't in the catalog.
+catalogMode: strict
+
+packages:
+    # published: @ajrsoftware/oxlint-plugin-*
+    - plugins/*
+    # private: shared code, bundled into each plugin at build time
+    - packages/*
+
+catalog:
+    '@changesets/cli': ^3.0.3
+    oxfmt: ^0.72.0
+    oxlint: ^1.87.0
+    tsdown: ^0.23.0
+    typescript: 7.0.2
+    vitest: ^5.0.3

@@ -1,0 +1,38 @@
+{
+    "name": "@ajrsoftware/oxlint-plugin-purist",
+    "version": "1.0.0",
+    "description": "Opinionated house style rules for oxlint: React conventions, named exports and kebab-case filenames.",
+    "keywords": [
+        "oxlint",
+        "oxlint-plugin"
+    ],
+    "license": "MIT",
+    "author": "@ajrsoftware",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ajrsoftware/oxlint-plugins.git",
+        "directory": "plugins/purist"
+    },
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "exports": "./dist/index.mjs",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "scripts": {
+        "build": "tsdown",
+        "typecheck": "tsc --project tsconfig.json",
+        "prepublishOnly": "pnpm build"
+    },
+    "devDependencies": {
+        "@ajrsoftware/oxlint-utils": "workspace:*",
+        "oxlint": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
+    },
+    "peerDependencies": {
+        "oxlint": "^1.87.0"
+    }
+}

@@ -1,0 +1,52 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+permissions:
+    contents: read
+
+# A newer push to the same branch or PR supersedes a run still in progress.
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci:
+        name: Check, test and build
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+
+            # pnpm version comes from `packageManager` in package.json.
+            - uses: pnpm/action-setup@v6
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            - run: pnpm install --frozen-lockfile
+
+            - name: Format
+              run: pnpm exec oxfmt --check
+
+            # Locally warnings are advisory; CI holds them to the same bar as errors.
+            - name: Lint
+              run: pnpm exec oxlint --deny-warnings
+
+            - name: Typecheck
+              run: pnpm typecheck
+
+            - name: Test
+              run: pnpm test
+
+            - name: Build
+              run: pnpm build
+
+            # Catches anything that would break `pnpm publish`, such as an
+            # unresolvable workspace: or catalog: specifier.
+            - name: Pack
+              run: pnpm --filter "./plugins/*" exec pnpm pack --dry-run

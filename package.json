@@ -1,0 +1,30 @@
+{
+    "name": "oxlint-plugins",
+    "private": true,
+    "license": "MIT",
+    "author": "@ajrsoftware",
+    "type": "module",
+    "scripts": {
+        "build": "pnpm --recursive build",
+        "typecheck": "pnpm --recursive typecheck",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "fmt": "oxfmt --check",
+        "lint": "oxlint",
+        "check": "oxfmt --check && oxlint && pnpm typecheck",
+        "fix": "oxlint --fix && oxfmt --write",
+        "update": "pnpm update --interactive --recursive --latest",
+        "changeset": "changeset",
+        "release": "pnpm build && changeset publish"
+    },
+    "devDependencies": {
+        "@changesets/cli": "catalog:",
+        "oxfmt": "catalog:",
+        "oxlint": "catalog:",
+        "vitest": "catalog:"
+    },
+    "engines": {
+        "node": "26.*"
+    },
+    "packageManager": "pnpm@12.11.2"
+}

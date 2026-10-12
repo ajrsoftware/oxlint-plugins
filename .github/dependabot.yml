@@ -1,0 +1,22 @@
+version: 2
+
+updates:
+    - package-ecosystem: github-actions
+      directory: /
+      schedule:
+          interval: weekly
+      groups:
+          actions:
+              patterns: ['*']
+
+    # Reads the catalog in pnpm-workspace.yaml, so a bump lands once for
+    # every package. The cooldown matches minimumReleaseAge.
+    - package-ecosystem: npm
+      directory: /
+      schedule:
+          interval: weekly
+      cooldown:
+          default-days: 1
+      groups:
+          dependencies:
+              patterns: ['*']
