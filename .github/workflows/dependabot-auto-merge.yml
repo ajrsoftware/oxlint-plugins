@@ -1,9 +1,10 @@
 name: Dependabot auto-merge
 
 # Minor and patch updates merge on their own once CI passes; majors wait for a
-# person. Dependency updates don't change the published bundles, so they add
-# no changeset and release nothing. They prove the plugins still work against
-# the newest oxlint.
+# person. Most updates only touch tooling, leave the published bundles
+# unchanged, and release nothing; they prove the plugins still work against
+# the newest oxlint. One that does change a bundle fails CI's changeset check,
+# so it never merges on its own and waits for a person to decide.
 on: pull_request
 
 permissions:
