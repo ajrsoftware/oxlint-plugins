@@ -19,6 +19,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v7
+              with:
+                  # The changeset check builds the PR's base to compare against.
+                  fetch-depth: 0
 
             # pnpm version comes from `packageManager` in package.json.
             - uses: pnpm/action-setup@v6
@@ -50,3 +53,11 @@ jobs:
             # unresolvable workspace: or catalog: specifier.
             - name: Pack
               run: pnpm --filter "./plugins/*" exec pnpm pack --dry-run
+
+            # A PR that changes what a plugin publishes must add a changeset
+            # for it, or an empty one (`pnpm changeset --empty`) to opt out.
+            - name: Changesets
+              if: github.event_name == 'pull_request'
+              run: node scripts/check-changesets.mjs "$BASE_SHA"
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}

@@ -21,7 +21,7 @@ pnpm update      # pick dependency updates interactively
 pnpm changeset   # record a release for the plugins a PR changes
 ```
 
-CI runs format, lint (warnings as errors), typecheck, test, build and a dry-run pack on every push to `main` and every pull request.
+CI runs format, lint (warnings as errors), typecheck, test, build and a dry-run pack on every push to `main` and every pull request. On a pull request it also checks that any plugin whose published output changes has a changeset (see [Releasing](#releasing)).
 
 ```
 plugins/<plugin>/            # published as @ajrsoftware/oxlint-plugin-<plugin>
@@ -50,11 +50,13 @@ Shared dependency versions live once in the `catalog` in `pnpm-workspace.yaml`; 
 - Add cases to that rule's `__test__` suite: valid code that must stay quiet, invalid code with the exact message, and `output` for anything it fixes (`output: null` when it reports without fixing).
 - Leave formatting to oxfmt. Fixes must come out clean after `oxlint --fix && oxfmt --write`.
 - Update the plugin's README for anything a user would notice: a new rule, option or default, or a change to what a rule flags or fixes.
-- Run `pnpm changeset`, pick the plugin and the bump, and write the CHANGELOG line. Changes that don't alter the published bundle (tests, docs, tooling) need no changeset.
+- Run `pnpm changeset`, pick the plugin and the bump, and write the CHANGELOG line. Changes that don't alter the published bundle (tests, docs, tooling) need no changeset. CI fails a PR that changes a plugin's published output without one.
 
 ### Releasing
 
-Releases are automatic and follow semver as ESLint plugins do:
+A changeset is the only thing that releases a plugin. A merge to `main` without one, whoever opened the PR, publishes nothing. With one, the release is automatic: each plugin it names is published to npm and gets its own tag and GitHub release, always together.
+
+The bump you pick in the changeset follows semver as ESLint plugins do:
 
 | Bump  | When                                                                                        |
 | ----- | ------------------------------------------------------------------------------------------- |
@@ -66,7 +68,9 @@ Releases are automatic and follow semver as ESLint plugins do:
 2. The release workflow opens a `chore: release` PR that bumps versions and writes each plugin's `CHANGELOG.md`, and turns on auto-merge.
 3. Once CI passes it merges, and the next run publishes to npm with provenance, tags `@ajrsoftware/oxlint-plugin-<name>@<version>`, and creates a GitHub release.
 
-Dependabot's minor and patch PRs auto-merge once CI passes, so every week the plugins are tested against the newest oxlint. They release nothing, because they don't change what is published. Majors wait for review.
+So a release can't be forgotten, CI checks every PR with `scripts/check-changesets.mjs`. It packs each plugin from the PR and from `main` and compares what a user would install: everything in the tarball except the docs, plus the `package.json` fields that affect installing (`dependencies`, `peerDependencies`, `exports`…). If a plugin's output changed and the PR adds no changeset naming it, CI fails. A change that alters the output but shouldn't release, such as a refactor that only moves code around in the bundle, opts out with `pnpm changeset --empty`. Run it locally with `node scripts/check-changesets.mjs origin/main`.
+
+Dependabot's minor and patch PRs auto-merge once CI passes, so every week the plugins are tested against the newest oxlint. Majors (a major of the dependency, not of a plugin) wait for review. Most updates only touch tooling (vitest, oxfmt, the oxlint we test against): users never install those, every plugin's output is unchanged, and they release nothing. When an update does change a plugin's output, such as a tsdown release that alters the bundle, CI's changeset check fails, so it doesn't auto-merge. Check out its branch, decide whether the change should ship, add `pnpm changeset` (release) or `pnpm changeset --empty` (no release), and push.
 
 Setup this relies on: a GitHub App installed on the repo (contents and pull requests: read and write) whose client ID and private key are stored as `RELEASE_APP_CLIENT_ID` and `RELEASE_APP_PRIVATE_KEY` in both the Actions and the Dependabot secrets; each plugin on npm linked to `release.yml` as a trusted publisher; auto-merge allowed in the repo settings; and a ruleset on `main` requiring the `Check, test and build` check.
 
