@@ -49,7 +49,8 @@ export interface RuleMeta {
     schema: unknown[];
 }
 
-export interface Rule<Options> {
+/** Rules without options omit `Options`, leaving `context.options` unusable. */
+export interface Rule<Options = never> {
     meta: RuleMeta;
     create(context: Context<Options>): Visitor;
 }

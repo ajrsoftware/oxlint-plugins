@@ -2,10 +2,11 @@
 
 A collection of [oxlint](https://oxc.rs/docs/guide/usage/linter) JS plugins from AJR Software. Each plugin is published on its own to npm, so a project installs only the rules it wants.
 
-| Plugin                                                            | What it offers                                                                       |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [`@ajrsoftware/oxlint-plugin-purist`](plugins/purist)             | Opinionated house style: React conventions, named exports only, kebab-case filenames |
-| [`@ajrsoftware/oxlint-plugin-sort-imports`](plugins/sort-imports) | Groups and orders the import block, fully auto-fixable                               |
+| Plugin                                                            | What it offers                                                                         |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [`@ajrsoftware/oxlint-plugin-purist`](plugins/purist)             | Opinionated house style: named exports only, kebab-case filenames                      |
+| [`@ajrsoftware/oxlint-plugin-react-preset`](plugins/react-preset) | React conventions: named imports, function-declaration components, `PropsWithChildren` |
+| [`@ajrsoftware/oxlint-plugin-sort-imports`](plugins/sort-imports) | Groups and orders the import block, fully auto-fixable                                 |
 
 Each plugin's README covers installing, configuring and what every rule checks.
 
@@ -78,4 +79,5 @@ Setup this relies on: a GitHub App installed on the repo (contents and pull requ
 
 1. Copy an existing `plugins/<name>` directory and rename it. Its `meta.name` must not be one of oxlint's built-in plugin names (`react`, `import`, `jsx-a11y`…), which oxlint rejects.
 2. Update `name`, `description` and `repository.directory` in its `package.json`, and reset `version`.
-3. Write its README and its `__test__` suites.
+3. Write its README and its `__test__` suites, and add a `major` changeset for it so the first release is 1.0.0.
+4. Before merging, put the package on npm once by hand. npm can only link a trusted publisher to a package that exists, and the release workflow has no token to create one. From the plugin's directory, run `pnpm build && npm publish --access public` to publish the `0.0.0` placeholder, then link the package to `release.yml` as a trusted publisher in its npm settings. CI publishes every version after that.

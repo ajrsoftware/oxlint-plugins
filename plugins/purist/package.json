@@ -1,7 +1,7 @@
 {
     "name": "@ajrsoftware/oxlint-plugin-purist",
     "version": "1.0.0",
-    "description": "Opinionated house style rules for oxlint: React conventions, named exports and kebab-case filenames.",
+    "description": "Opinionated house style rules for oxlint: named exports and kebab-case filenames.",
     "keywords": [
         "oxlint",
         "oxlint-plugin"
