@@ -1,6 +1,6 @@
 {
     "name": "@ajrsoftware/oxlint-plugin-react-preset",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "description": "Opinionated React conventions for oxlint: named react imports, function-declaration components and PropsWithChildren.",
     "keywords": [
         "oxlint",
