@@ -1,13 +1,15 @@
 # @ajrsoftware/oxlint-plugin-purist
 
-Opinionated house style for [oxlint](https://oxc.rs/docs/guide/usage/linter): React conventions, named exports only, and kebab-case filenames.
+Opinionated house style for [oxlint](https://oxc.rs/docs/guide/usage/linter): named exports only and kebab-case filenames.
 
-| Rule                             | What it enforces                                                          | Auto-fix |
-| -------------------------------- | ------------------------------------------------------------------------- | -------- |
-| [`purist/react`](#puristreact)   | Named React imports, function-declaration components, `PropsWithChildren` | Partly   |
-| [`purist/preset`](#puristpreset) | Named exports only, kebab-case filenames                                  | Partly   |
+| Rule                                                   | What it enforces     | Auto-fix |
+| ------------------------------------------------------ | -------------------- | -------- |
+| [`purist/no-default-export`](#puristno-default-export) | Named exports only   | Partly   |
+| [`purist/filename-case`](#puristfilename-case)         | Kebab-case filenames | No       |
 
-Loading the plugin enables nothing on its own. Turn on the rules you want, so a non-React project can use `purist/preset` alone.
+Loading the plugin enables nothing on its own. Turn on the rules you want.
+
+For React conventions, see [`@ajrsoftware/oxlint-plugin-react-preset`](../react-preset).
 
 ## Install
 
@@ -23,8 +25,7 @@ Requires oxlint `^1.87.0`.
 {
     "jsPlugins": ["@ajrsoftware/oxlint-plugin-purist"],
     "rules": {
-        "purist/react": "error",
-        "purist/preset": [
+        "purist/no-default-export": [
             "error",
             {
                 "allowDefaultExport": [
@@ -33,87 +34,29 @@ Requires oxlint `^1.87.0`.
                     "src/app/**/layout.tsx"
                 ]
             }
-        ]
+        ],
+        "purist/filename-case": "error"
     }
 }
 ```
 
-## Using with oxfmt
+Each rule can be set to `"off"`, `"warn"` or `"error"` on its own, and disabled on its own with a comment such as `// oxlint-disable-next-line purist/no-default-export`.
 
-Nothing in oxfmt's config conflicts with these rules. Run the fix before the formatter:
+## Upgrading from 1.x
 
-```json
-// package.json
-{ "scripts": { "fix": "oxlint --fix && oxfmt --write" } }
-```
+2.0 split `purist/preset` into one rule per check and moved `purist/react` to its own plugin:
 
-Auto-fixes leave formatting to oxfmt. Turning `const Card = () => <div />` into a function declaration, for example, writes a plain `{ return <div />; }` body without indentation. Run the formatter after the fix, and one pass leaves the file clean for both tools. Run it before, and `oxfmt --check` fails until you format again.
+| 1.x                                                               | 2.x                                                                                     |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `purist/preset` → named exports, `allowDefaultExport`             | `purist/no-default-export` → `allowDefaultExport`                                       |
+| `purist/preset` → filenames, `filenamePattern`, `ignoreFilenames` | `purist/filename-case` → `filenamePattern`, `ignoreFilenames`                           |
+| `purist/react`                                                    | [`@ajrsoftware/oxlint-plugin-react-preset`](../react-preset#upgrading-from-puristreact) |
 
-## `purist/react`
+What each check flags and fixes is unchanged. Disable comments naming `purist/preset` or `purist/react` need the new rule names.
 
-Four React conventions in one rule.
+## `purist/no-default-export`
 
-**1. No reaching through the `React` namespace**, in values or types.
-
-```tsx
-// ✗
-const [open, setOpen] = React.useState(false);
-let node: React.ReactNode;
-
-// ✓
-import { useState, type ReactNode } from 'react';
-```
-
-**2. No default or namespace import of `react`.**
-
-```tsx
-// ✗
-import React from 'react';
-import * as React from 'react';
-
-// ✓
-import { useState } from 'react';
-```
-
-**3. Components are function declarations**, never arrow functions or function expressions. Auto-fixed.
-
-```tsx
-// ✗
-export const Card = ({ title }: Props) => <h1>{title}</h1>;
-
-// ✓
-export function Card({ title }: Props) {
-    return <h1>{title}</h1>;
-}
-```
-
-A variable counts as a component when its name matches `componentNamePattern` and its function either contains JSX or returns a call to another PascalCase function (a wrapper like `const Page = (p) => RootPage(p)`). `const GET = () => new Response()` is left alone.
-
-The fix is skipped, and the problem only reported, when the rewrite can't carry everything over: a type annotation on the variable (`const Card: FC = …`), several declarators in one statement, or a generator.
-
-**4. `children` comes from `PropsWithChildren`**, never declared by hand. This checks inline props types, intersections, and type aliases or interfaces declared in the same file.
-
-```tsx
-// ✗
-type Props = { title: string; children: ReactNode };
-
-// ✓
-type Props = PropsWithChildren<{ title: string }>;
-```
-
-Only (3) auto-fixes. The others need coordinated edits to the `react` import, and several can land in one file at once, so they are reported for a person to fix.
-
-### Options
-
-| Option                 | Type     | Default               | Description                                                    |
-| ---------------------- | -------- | --------------------- | -------------------------------------------------------------- |
-| `componentNamePattern` | `string` | `^[A-Z][A-Za-z0-9]*$` | Regex a variable name must match to be treated as a component. |
-
-## `purist/preset`
-
-House conventions that aren't tied to a framework.
-
-**1. Named exports only.** Flags `export default …`, `export { x as default }` and `export { default } from …`.
+Named exports only. Flags `export default …`, `export { x as default }` and `export { default } from …`.
 
 ```ts
 // ✗
@@ -127,7 +70,17 @@ A named `export default function Name` or `export default class Name` is auto-fi
 
 Frameworks that need a default export (Next.js pages and layouts, config files) are exempted with `allowDefaultExport` instead of a disable comment in each file.
 
-**2. Filenames are kebab-case.** The part of the filename before the first `.` must match `filenamePattern`.
+### Options
+
+| Option               | Type       | Default             | Description                              |
+| -------------------- | ---------- | ------------------- | ---------------------------------------- |
+| `allowDefaultExport` | `string[]` | `["**/*.config.*"]` | Globs of files allowed a default export. |
+
+Setting `allowDefaultExport` replaces the default, so include `**/*.config.*` yourself if you still want it.
+
+## `purist/filename-case`
+
+Filenames are kebab-case. The part of the filename before the first `.` must match `filenamePattern`.
 
 ```
 ✗ src/Card.tsx   src/useThing.ts   src/snake_case.ts
@@ -138,10 +91,9 @@ Next.js dynamic segments such as `[slug].tsx` are always allowed.
 
 ### Options
 
-| Option               | Type       | Default                    | Description                                           |
-| -------------------- | ---------- | -------------------------- | ----------------------------------------------------- |
-| `allowDefaultExport` | `string[]` | `["**/*.config.*"]`        | Globs of files allowed a default export.              |
-| `filenamePattern`    | `string`   | `^[a-z0-9]+(-[a-z0-9]+)*$` | Regex the filename (before the first `.`) must match. |
-| `ignoreFilenames`    | `string[]` | `[]`                       | Globs of files skipped by the filename check.         |
+| Option            | Type       | Default                    | Description                                           |
+| ----------------- | ---------- | -------------------------- | ----------------------------------------------------- |
+| `filenamePattern` | `string`   | `^[a-z0-9]+(-[a-z0-9]+)*$` | Regex the filename (before the first `.`) must match. |
+| `ignoreFilenames` | `string[]` | `[]`                       | Globs of files skipped by this rule.                  |
 
-Globs are matched against the path relative to where oxlint runs, usually the repo root. `**` crosses directories; `*` and `?` stay within one. Setting `allowDefaultExport` replaces the default, so include `**/*.config.*` yourself if you still want it.
+Globs, here and in `allowDefaultExport`, are matched against the path relative to where oxlint runs, usually the repo root. `**` crosses directories; `*` and `?` stay within one.

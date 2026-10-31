@@ -1,4 +1,5 @@
-import { identifierName, some, type AstNode } from '@ajrsoftware/oxlint-utils';
+import { identifierName, some } from './ast.ts';
+import type { AstNode } from './types.ts';
 
 const JSX_NODES = new Set(['JSXElement', 'JSXFragment']);
 

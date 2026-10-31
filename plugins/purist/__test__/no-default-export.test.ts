@@ -1,21 +1,14 @@
 import { runRuleTests } from '@ajrsoftware/oxlint-utils/testing';
-import { preset } from '../src/rules/preset/index.ts';
+import { noDefaultExport } from '../src/rules/no-default-export/index.ts';
 
 const namedExport = 'Use a named export. Default exports are not allowed.';
-const kebab = (file: string) =>
-    `Filename '${file}' must be kebab-case (lowercase words separated by '-').`;
 
-runRuleTests('purist/preset', preset, {
+runRuleTests('purist/no-default-export', noDefaultExport, {
     valid: [
         {
-            name: 'named exports in a kebab-case file',
+            name: 'named exports',
             code: 'export const a = 1;\nexport function b() {}',
             filename: 'src/lib/kebab-case.ts'
-        },
-        {
-            name: 'single-word lowercase filename',
-            code: 'export const a = 1;',
-            filename: 'src/index.ts'
         },
         {
             name: 'config files may default export',
@@ -35,48 +28,18 @@ runRuleTests('purist/preset', preset, {
             options: [{ allowDefaultExport: ['./src/app/*.tsx'] }]
         },
         {
-            name: 'Next.js dynamic segments skip the filename check',
-            code: 'export const a = 1;',
-            filename: 'src/app/[slug].tsx'
-        },
-        {
-            name: 'ignoreFilenames skips the filename check',
-            code: 'export const a = 1;',
-            filename: 'src/README.ts',
-            options: [{ ignoreFilenames: ['src/README.ts'] }]
-        },
-        {
-            name: 'filenamePattern replaces the kebab-case pattern',
-            code: 'export const a = 1;',
-            filename: 'src/camelCase.ts',
-            options: [{ filenamePattern: '^[a-z][a-zA-Z]*$' }]
-        },
-        {
             name: 'export { x as y } is not a default export',
             code: 'const a = 1;\nexport { a as b };',
             filename: 'src/a.ts'
+        },
+        {
+            name: 'the filename is not checked',
+            code: 'export const a = 1;',
+            filename: 'src/camelCase.ts'
         }
     ],
 
     invalid: [
-        {
-            name: 'camelCase filename',
-            code: 'export const a = 1;',
-            filename: 'src/camelCase.ts',
-            errors: [{ message: kebab('camelCase.ts') }]
-        },
-        {
-            name: 'snake_case filename',
-            code: 'export const a = 1;',
-            filename: 'src/snake_case.ts',
-            errors: [{ message: kebab('snake_case.ts') }]
-        },
-        {
-            name: 'PascalCase component filename',
-            code: 'export function Card() {}',
-            filename: 'src/Card.tsx',
-            errors: [{ message: kebab('Card.tsx') }]
-        },
         {
             name: 'named default function drops the default',
             code: 'export default function Card() {}',
@@ -130,13 +93,6 @@ runRuleTests('purist/preset', preset, {
             options: [{ allowDefaultExport: ['src/app/**'] }],
             output: null,
             errors: [{ message: namedExport }]
-        },
-        {
-            name: 'bad filename and default export together',
-            code: 'export default function Card() {}',
-            filename: 'src/Card.tsx',
-            output: 'export function Card() {}',
-            errors: [{ message: kebab('Card.tsx') }, { message: namedExport }]
         }
     ]
 });

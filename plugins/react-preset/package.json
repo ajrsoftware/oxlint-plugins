@@ -1,0 +1,39 @@
+{
+    "name": "@ajrsoftware/oxlint-plugin-react-preset",
+    "version": "0.0.0",
+    "description": "Opinionated React conventions for oxlint: named react imports, function-declaration components and PropsWithChildren.",
+    "keywords": [
+        "oxlint",
+        "oxlint-plugin",
+        "react"
+    ],
+    "license": "MIT",
+    "author": "@ajrsoftware",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ajrsoftware/oxlint-plugins.git",
+        "directory": "plugins/react-preset"
+    },
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "exports": "./dist/index.mjs",
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tsdown",
+        "typecheck": "tsc --project tsconfig.json",
+        "prepublishOnly": "pnpm build"
+    },
+    "devDependencies": {
+        "@ajrsoftware/oxlint-utils": "workspace:*",
+        "oxlint": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
+    },
+    "peerDependencies": {
+        "oxlint": "^1.87.0"
+    }
+}

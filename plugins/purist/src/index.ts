@@ -6,13 +6,13 @@
  */
 
 import type { Plugin } from '@ajrsoftware/oxlint-utils';
-import { preset } from './rules/preset/index.ts';
-import { react } from './rules/react/index.ts';
+import { filenameCase } from './rules/filename-case/index.ts';
+import { noDefaultExport } from './rules/no-default-export/index.ts';
 
 export default {
     meta: { name: 'purist' },
     rules: {
-        react,
-        preset
+        'no-default-export': noDefaultExport,
+        'filename-case': filenameCase
     }
 } satisfies Plugin;
