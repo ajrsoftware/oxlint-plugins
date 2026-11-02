@@ -71,6 +71,15 @@ runRuleTests('sort-imports/order', order, {
         {
             name: 'a missing semicolon is not counted',
             code: lines("import { bbb } from 'b'", "import { aa } from 'a';")
+        },
+        {
+            name: 'an indented script block already in order',
+            code: lines(
+                "\timport { readFile } from 'node:fs';",
+                '',
+                "\timport { b } from './b';",
+                '\tlet x = 1;'
+            )
         }
     ],
 
@@ -267,6 +276,74 @@ runRuleTests('sort-imports/order', order, {
                 "import { b } from './b';",
                 '',
                 "import { a } from 'a';"
+            ),
+            errors
+        },
+        {
+            name: 'sveltekit $lib imports group with local imports',
+            code: lines(
+                "import { a } from '$lib/a';",
+                "import { z } from 'zod';"
+            ),
+            output: lines(
+                "import { z } from 'zod';",
+                '',
+                "import { a } from '$lib/a';"
+            ),
+            errors
+        },
+        {
+            name: 'a tab-indented script block keeps its indentation',
+            code: lines(
+                "\timport { b } from './b';",
+                "\timport { readFile } from 'node:fs';",
+                "\timport type { FC } from 'react';",
+                '\tlet x = 1;'
+            ),
+            output: lines(
+                "\timport type { FC } from 'react';",
+                '',
+                "\timport { readFile } from 'node:fs';",
+                '',
+                "\timport { b } from './b';",
+                '\tlet x = 1;'
+            ),
+            errors
+        },
+        {
+            name: 'a space-indented script block keeps its indentation',
+            code: lines(
+                "  import { b } from './b';",
+                "  import { a } from 'a';"
+            ),
+            output: lines(
+                "  import { a } from 'a';",
+                '',
+                "  import { b } from './b';"
+            ),
+            errors
+        },
+        {
+            name: 'an indented directive, wrapped import and comment',
+            code: lines(
+                "\t'use strict';",
+                "\timport { b } from './b';",
+                '\t// about fs',
+                '\timport {',
+                '\t\treadFile,',
+                '\t\twriteFile',
+                "\t} from 'node:fs';"
+            ),
+            output: lines(
+                "\t'use strict';",
+                '',
+                '\t// about fs',
+                '\timport {',
+                '\t\treadFile,',
+                '\t\twriteFile',
+                "\t} from 'node:fs';",
+                '',
+                "\timport { b } from './b';"
             ),
             errors
         }

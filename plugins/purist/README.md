@@ -97,3 +97,27 @@ Next.js dynamic segments such as `[slug].tsx` are always allowed.
 | `ignoreFilenames` | `string[]` | `[]`                       | Globs of files skipped by this rule.                  |
 
 Globs, here and in `allowDefaultExport`, are matched against the path relative to where oxlint runs, usually the repo root. `**` crosses directories; `*` and `?` stay within one.
+
+## Vue, Svelte and Astro
+
+oxlint lints each `<script>` block, and an Astro file's frontmatter, on its own, so both rules run on these files. Their conventions clash with the defaults in two places:
+
+- Components are usually PascalCase (`Card.vue`, `Layout.astro`). Skip them with `ignoreFilenames`.
+- A Vue component written with the Options API needs `export default`. Allow it with `allowDefaultExport`.
+
+```json
+{
+    "rules": {
+        "purist/filename-case": [
+            "error",
+            { "ignoreFilenames": ["**/*.vue", "**/*.svelte", "**/*.astro"] }
+        ],
+        "purist/no-default-export": [
+            "error",
+            { "allowDefaultExport": ["**/*.config.*", "**/*.vue"] }
+        ]
+    }
+}
+```
+
+A file with more than one script block, such as a Svelte component with a module script, gets a `filename-case` error once per block.

@@ -26,7 +26,7 @@ const DEFAULT_GROUPS: (string | string[])[] = [
     ['internal', 'parent', 'sibling', 'index']
 ];
 
-const DEFAULT_INTERNAL = ['~/', '@/', '#'];
+const DEFAULT_INTERNAL = ['~/', '@/', '#', '$lib/'];
 
 export const order = {
     meta: {
@@ -144,6 +144,15 @@ export const order = {
                 }
                 if (pending.length) partitions.push(pending);
 
+                // Script blocks in .svelte and .vue files are often indented,
+                // and oxlint lints them without the surrounding markup. Every
+                // line we write takes the first import's indentation.
+                const lineStart =
+                    source.lastIndexOf('\n', entries[0].start - 1) + 1;
+                const lead = source.slice(lineStart, entries[0].start);
+                const indent = lead.trim() === '' ? lead : '';
+                const newline = '\n' + indent;
+
                 const blocks: string[] = [];
                 for (const partition of partitions) {
                     if (partition.length === 1 && partition[0].sideEffect) {
@@ -167,11 +176,11 @@ export const order = {
                                         b.node.source.value
                                     )
                             );
-                        blocks.push(sorted.map((e) => e.text).join('\n'));
+                        blocks.push(sorted.map((e) => e.text).join(newline));
                     }
                 }
 
-                const desired = blocks.join('\n\n');
+                const desired = blocks.join('\n' + newline);
                 const rangeEnd = run[run.length - 1].range[1];
 
                 // Only absorb the gap after a directive when it is pure
@@ -180,7 +189,8 @@ export const order = {
                     directiveEnd !== null &&
                     source.slice(directiveEnd, entries[0].start).trim() === '';
                 const rangeStart = gapIsBlank ? directiveEnd : entries[0].start;
-                const replacement = (gapIsBlank ? '\n\n' : '') + desired;
+                const replacement =
+                    (gapIsBlank ? '\n' + newline : '') + desired;
 
                 if (source.slice(rangeStart, rangeEnd) === replacement) return;
 
