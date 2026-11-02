@@ -92,12 +92,16 @@ What moves, and what doesn't:
 - **Comments directly above an import move with it.** A comment separated from the imports by a blank line, such as a file header, stays where it is.
 - **Side-effect imports stay put.** Reordering `import './styles.css'` can change behaviour, so each one stays where it is, and the imports above and below it are sorted separately.
 
+## Vue, Svelte and Astro
+
+oxlint lints each script part of a `.vue`, `.svelte` or `.astro` file on its own: every `<script>` block, and an Astro file's frontmatter. The rule sorts the leading imports of each part separately and never touches the markup around them. An indented `<script>` keeps its indentation: every import is written at the indentation of the first one.
+
 ## Options
 
-| Option            | Type                 | Default                | Description                                                                    |
-| ----------------- | -------------------- | ---------------------- | ------------------------------------------------------------------------------ |
-| `internalPattern` | `string[]`           | `["~/", "@/", "#"]`    | Specifier prefixes treated as `internal`, e.g. path aliases or your own scope. |
-| `groups`          | `(Kind \| Kind[])[]` | the three groups above | The groups, in order. Kinds left out are placed in a final group.              |
+| Option            | Type                 | Default                      | Description                                                                    |
+| ----------------- | -------------------- | ---------------------------- | ------------------------------------------------------------------------------ |
+| `internalPattern` | `string[]`           | `["~/", "@/", "#", "$lib/"]` | Specifier prefixes treated as `internal`, e.g. path aliases or your own scope. |
+| `groups`          | `(Kind \| Kind[])[]` | the three groups above       | The groups, in order. Kinds left out are placed in a final group.              |
 
 ```json
 {
